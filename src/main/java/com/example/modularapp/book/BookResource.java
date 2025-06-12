@@ -1,0 +1,55 @@
+package com.example.modularapp.book;
+
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import org.jboss.logging.Logger;
+
+import java.util.List;
+
+@Path("/books")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class BookResource {
+
+    private static final Logger LOGGER = Logger.getLogger(BookResource.class);
+
+    @Inject
+    BookService service;
+
+    @GET
+    public List<Book> list() {
+         System.out.println("Received List BookDTO: ");
+       
+        return service.listAll();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response add(BookDTO dto) {
+        System.out.println("Received BookDTO: " + dto.title + ", " + dto.author);
+        return Response.status(Response.Status.CREATED).entity(service.add(dto)).build();
+    }
+
+    @PUT
+    @Path("/{id}")
+    public Response update(@PathParam("id") Long id, BookDTO dto) {
+        Book updated = service.update(id, dto);
+        if (updated == null) return Response.status(Response.Status.NOT_FOUND).build();
+        return Response.ok(updated).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response delete(@PathParam("id") Long id) {
+        return service.delete(id) ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Response get(@PathParam("id") Long id) {
+        Book book = service.findById(id);
+        return (book == null) ? Response.status(Response.Status.NOT_FOUND).build() : Response.ok(book).build();
+    }
+}
