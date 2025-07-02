@@ -1,15 +1,24 @@
 package com.example.modularapp.book;
 
-public class Book {
+import com.example.modularapp.author.Author;
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.*;
+
+@Entity
+public class Book extends PanacheEntityBase {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
+
+    @Column(nullable = false)
     public String title;
-    public String author;
 
-    public Book() {}
+    @Column(nullable = false)
+    public int year;
 
-    public Book(Long id, String title, String author) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-    }
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    public Author author;
+
 }
